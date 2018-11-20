@@ -207,18 +207,55 @@ sudo pip install bisos.bootstrap
 
 \section{Usage}
 
-\begin{verbatim}
-/usr/local/bin/bx2Genesis.sh
-/usr/local/bin/bxBootstrapGuest.sh
-\end{verbatim}
+\subsection{bx2Genesis.sh}
+
+% \begin{verbatim}
+% /usr/local/bin/bx2Genesis.sh
+% /usr/local/bin/bxBootstrapGuest.sh
+% \end{verbatim}
 
 On a virgin BxP-Distro, run ``sudo /usr/local/bin/bx2Genesis.sh'' and 
 you will end up with a Generic BISOS Platform. Which you can then
 apply to a desired bxpCharacter.
 
+\subsection{bxBootstrapGuest}
+
 On any Linux machine that has kvm in its distro, run 
 /usr/local/bin/bxBootstrapGuest.sh and you will end up with 
 a guest at the specified desired level (as ByStar Platforms).
+
+\subsection{"./bin/bxHostGenGuestVagrant"}
+
+On any Linux Machine that has VirtualBox and Vagrant installed,
+run bxHostGenGuestVagrant and based on params and args build a VM
+that includes what is specified.
+
+The Steps are as follows:
+\begin{itemize}
+\item Create A VM
+\item In the created VM as root:
+  \begin{itemize}
+  \item install python and pip
+  \item install git
+  \item pip install bisos.bootstrap
+  \item Run xxx to create user bxGenesis and add it to sudoers    
+  \end{itemize}
+\item In the created VM as bxGenesis run bisos.bootstrap/bin/bxGenWithRepo
+\item Login to the VM as bxGenesis
+\item Run the post install script.  
+\end{itemize}  
+
+\subsection{"./bin/bxGenWithRepo"}
+
+Does the following:
+
+\begin{itemize}
+\item Clone specified repo
+\item From within that repo executes specified entry point with params and args. \
+  This typically involves creating an account
+\end{itemize}  
+
+
 
 %%%#+BEGIN: bx:dblock:lcnt:main-end :class "memo" :langs "en+fa"
 \begin{comment}

@@ -23,7 +23,7 @@ __icmName__ = "bxHostGenGuestVagrant"
 ####+END:
 
 ####+BEGIN: bx:global:timestamp:version-py :style "date"
-__version__ = "201811200421"
+__version__ = "201811210236"
 ####+END:
 
 ####+BEGIN: bx:global:icm:status-py :status "Production"
@@ -314,14 +314,25 @@ def g_argsExtraSpecify(
     )
     
     icmParams.parDictAdd(
-        parName='vmPurpose',
-        parDescription="Purpose Of VM",
+        parName='vmConfig',
+        parDescription="Configuration Of Desired VM -- Size, Network",
+        parDataType=None,
+        parDefault="medium-nat",
+        parChoices=["medium-nat", "large-bridge"],
+        parScope=icm.ICM_ParamScope.TargetParam,
+        argparseShortOpt=None,
+        argparseLongOpt='--vmConfig',
+    )
+
+    icmParams.parDictAdd(
+        parName='genWithRepoSpec',
+        parDescription="Base Of Params For bxGenWithRepo",
         parDataType=None,
         parDefault="bxContainer",
         parChoices=["bxContainer", "server"],
         parScope=icm.ICM_ParamScope.TargetParam,
         argparseShortOpt=None,
-        argparseLongOpt='--vmPurpose',
+        argparseLongOpt='--genWithRepoSpec',
     )
     
     
@@ -415,13 +426,53 @@ class examples(icm.Cmnd):
 """
 ####+END:
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmPurpose" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantHostPrep" :comment "" :parsMand "" :parsOpt "" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmPurpose argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantHostPrep/ parsMand= parsOpt= argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class vagrantFileStdout(icm.Cmnd):
+class vagrantHostPrep(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmPurpose', ]
+    cmndParamsOptional = [ ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+
+        callParamsDict = {}
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+
+####+END:
+
+        #
+        # NOTYET, should install vagrant and virtualbox as needed
+        #
+
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=None,
+        )
+
+
+
+    
+
+    
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdateRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdateRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileUpdateRun(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -430,117 +481,69 @@ class vagrantFileStdout(icm.Cmnd):
         distroName=None,         # or Cmnd-Input
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
-        vmPurpose=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmPurpose': vmPurpose, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
-        vmPurpose = callParamsDict['vmPurpose']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
 
 ####+END:
-        outcome = offlineimaprcStdout().cmnd(
+
+        outcome = vagrantFileStdout().cmnd(
             interactive=False,
-            inMailAcct=inMailAcct,
-            bxoId=bxoId,
-            sr=sr,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
-        offlineimaprcStr = outcome.results
+        resStr = outcome.results
 
-        offlineimaprcPath = withInMailDomGetOfflineimaprcPath(
-            controlProfile,
-            inMailAcct,
-            bxoId,
-            sr,
+        outcome = vagrantFileName().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
         )
-
-        rcFileFromControl = "{controlProfileBaseDir}/inMail/{inMailAcct}/conf/_offlineimaprc".format(
-            # ../control/inMail/example.com/conf/_offlineimaprc
-            controlProfileBaseDir=marmeAcctsLib.controlProfileBaseDirGet(
-                controlProfile,
-                bxoId=bxoId,
-                sr=sr,
-            ),
-            inMailAcct=inMailAcct,
-        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
         
-        if os.path.isfile(rcFileFromControl):
-            shutil.copyfile(rcFileFromControl, offlineimaprcPath)
-        else:
-            with open(offlineimaprcPath, "w") as thisFile:
-                thisFile.write(offlineimaprcStr + '\n')
+        resFilePath = outcome.results
 
-        thisPath = marmeAcctsLib.getPathForAcctMaildir(
-            controlProfile,
-            inMailAcct,
-            bxoId=bxoId,
-            sr=sr,
-        )
-
-        try:
-            os.makedirs(thisPath)
-        except OSError:
-            if not os.path.isdir(thisPath):
-                raise
+        with open(resFilePath, "w") as thisFile:
+            thisFile.write(resStr + '\n')
 
         if interactive:
-            icm.ANN_here("offlineimaprcPath={val}".format(val=offlineimaprcPath))
+            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
         
         return cmndOutcome.set(
             opError=icm.OpError.Success,
-            opResults=offlineimaprcStr,
+            opResults=resFilePath,
         )
 
-####+BEGIN: bx:icm:python:func :funcName "withInMailDomGetOfflineimaprcPath" :funcType "anyOrNone" :retType "bool" :deco "" :argsList "controlProfile inMailAcct bxoId sr"
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /withInMailDomGetOfflineimaprcPath/ retType=bool argsList=(controlProfile inMailAcct bxoId sr)  [[elisp:(org-cycle)][| ]]
-"""
-def withInMailDomGetOfflineimaprcPath(
-    controlProfile,
-    inMailAcct,
-    bxoId,
-    sr,
-):
-####+END:
-    inMailAcctConfBase = os.path.abspath(
-        "{configBaseDir}"
-        .format(configBaseDir=marmeAcctsLib.getPathForInMailConfig(
-            controlProfile,
-            inMailAcct,
-            bxoId=bxoId,
-            sr=sr,
-        ))
-    )
-
-    try: 
-        os.makedirs(inMailAcctConfBase)
-    except OSError:
-        if not os.path.isdir(inMailAcctConfBase):
-            raise
-
-    offlineimaprcFile = os.path.join(
-        inMailAcctConfBase,
-        "_offlineimaprc"
-    )
-    return offlineimaprcFile
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmPurpose" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmPurpose argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class vagrantFileStdout(icm.Cmnd):
+class vagrantFileRun(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmPurpose', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -549,78 +552,424 @@ class vagrantFileStdout(icm.Cmnd):
         distroName=None,         # or Cmnd-Input
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
-        vmPurpose=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmPurpose': vmPurpose, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
-        vmPurpose = callParamsDict['vmPurpose']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
 
 ####+END:
 
-        print("First We Need To Locate The Template {distroName}".format(distroName=distroName))
-
-        return
-
-
-        outcome = marmeAcctsLib.inMailAcctParsGet().cmnd(
+        outcome = vagrantFileStdout().cmnd(
             interactive=False,
-            bxoId=bxoId,
-            sr=sr,
-            inMailAcct=inMailAcct,
-            argsList=['access'],
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
-        fileParamDict = outcome.results
+        resStr = outcome.results
 
-        outcome = marmeAcctsLib.inMailAcctParsGet().cmnd(
+        outcome = vagrantFileName().cmnd(
             interactive=False,
-            bxoId=bxoId,
-            sr=sr,
-            inMailAcct=inMailAcct,
-            argsList=['retrieval']
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-        fileParamRetrievalDict = outcome.results
+        
+        resFilePath = outcome.results
 
-        mailDirFullPath = fileParamRetrievalDict['inMailAcctMboxesPath'].parValueGet()
-        if not mailDirFullPath: return icm.EH_badOutcome(outcome)
+        with open(resFilePath, "w") as thisFile:
+            thisFile.write(resStr + '\n')
 
-        try: 
-            os.makedirs(mailDirFullPath)
-        except OSError:
-            if not os.path.isdir(mailDirFullPath):
-                raise
+        if interactive:
+            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
+        
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=resFilePath,
+        )
 
-        mboxesList = fileParamRetrievalDict['mboxesList'].parValueGet()
 
-        foldersListStr = ""
-        if mboxesList == "all":
-            folderFilterLineStr = "#"
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "1" :argsMax "999" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileRun(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndArgsLen = {'Min': 0, 'Max': 999,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
         else:
-            for each in mboxesList.split():
-                foldersListStr += "'INBOX.{}',".format(each)
-                
-            folderFilterLineStr = """folderfilter = lambda name: name in [ {foldersListStr} ]""".format(
-                foldersListStr=foldersListStr)
+            effectiveArgsList = argsList
 
-        resStr = offlineimaprcTemplate().format(
-            inMailAcctMboxesPath=mailDirFullPath,
-            imapServer=fileParamDict['imapServer'].parValueGet(),
-            userName=fileParamDict['userName'].parValueGet(),
-            userPasswd=fileParamDict['userPasswd'].parValueGet(),
-            ssl=fileParamRetrievalDict['ssl'].parValueGet(),            
-            foldersListStr=foldersListStr,
-            folderFilterLine=folderFilterLineStr,
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+
+        #
+        # NOTYET, IMPORTANT, the yasnipet used for this is bad
+        #   Indentation is wrong
+        #   1:end  should be 1&999
+        #   argsMin=0 is mis-handled
+        #
+
+        action = effectiveArgsList[0]
+        effectiveArgsList.pop(0)
+
+        print(action)
+    
+        for each in effectiveArgsList:
+            print each
+
+            outcome = icm.subProc_bash("""\
+echo  {argsList}"""
+                                    .format(argsList=" ".join(effectiveArgsList))
+            ).log()
+            if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=None,
+        )
+
+####+BEGIN: bx:icm:python:method :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
+    """
+**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndArgsSpec/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndArgsSpec(self):
+####+END:        
+        """
+***** Cmnd Args Specification
+"""
+        cmndArgsSpecDict = icm.CmndArgsSpecDict()
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="0",
+            argName="action",
+            argChoices=['list', 'print'],
+            argDescription="Action to be specified by rest"
+        )
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="1&999",
+            argName="actionPars",
+            argChoices='Any',
+            argDescription="Rest of args for use by action"
+        )
+
+        return cmndArgsSpecDict
+
+
+####+BEGIN: bx:icm:python:method :methodName "cmndDocStr" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
+    """
+**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndDocStr/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndDocStr(self):
+####+END:        
+        return """
+***** TODO [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Place holder for this commands doc string.
+"""
+
+    
+    
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileUpdate(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+
+####+END:
+
+        outcome = vagrantFileStdout().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        resStr = outcome.results
+
+        outcome = vagrantFileName().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+        
+        resFilePath = outcome.results
+
+        with open(resFilePath, "w") as thisFile:
+            thisFile.write(resStr + '\n')
+
+        if interactive:
+            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
+        
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=resFilePath,
+        )
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileName" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileName/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileName(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+
+####+END:
+
+        vagrantsBaseDir = pkgAnchor_vagrantsDir_obtain()
+
+        vagrantTemplateFile = os.path.join(
+            vagrantsBaseDir,
+            distroName,
+            distroVersion,
+            distroFlavor,
+            vmConfig,
+            genWithRepoSpec,
+            "Vagrantfile"
+        )
+
+        if interactive:
+            icm.ANN_write(
+            """{vagrantTemplateFile}"""
+            .format(vagrantTemplateFile=vagrantTemplateFile)
+            )
+            
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=vagrantTemplateFile
+        )
+    
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileTemplate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileTemplate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileTemplate(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+
+####+END:
+
+        vagrantsBaseDir = pkgAnchor_vagrantsDir_obtain()
+
+        vagrantTemplateFile = os.path.join(
+            vagrantsBaseDir,
+            distroName,
+            distroVersion,
+            distroFlavor,
+            vmConfig,
+            genWithRepoSpec,
+            "vagrantfile.template"
+        )
+
+        if not os.path.isfile(vagrantTemplateFile):
+            return(icm.EH_badOutcome(outcome))
+
+
+        if interactive:
+            icm.ANN_write(
+            """{vagrantTemplateFile}"""
+            .format(vagrantTemplateFile=vagrantTemplateFile)
+            )
+            
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=vagrantTemplateFile
+        )
+
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileStdout(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        genWithRepoSpec=None,         # or Cmnd-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+
+####+END:
+
+        outcome = vagrantFileTemplate().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            genWithRepoSpec=genWithRepoSpec,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        vagrantTemplateFile = outcome.results
+
+        genReposSpecBaseDir = pkgAnchor_genReposSpecDir_obtain()
+
+        if not os.path.isfile(vagrantTemplateFile):
+            return(icm.EH_badOutcome(outcome))
+
+        with open (vagrantTemplateFile, "r") as myfile:
+            vagrantTemplateStr = myfile.read()
+
+        # icm.ANN_write(
+        #     """vagrantsBaseDir= {vagrantsBaseDir} --- genReposSpecBaseDir= {genReposSpecBaseDir}"""
+	    # .format(vagrantsBaseDir=vagrantsBaseDir, genReposSpecBaseDir=genReposSpecBaseDir)
+        # )
+
+        resStr = vagrantTemplateStr.format(
+            vmName="",
         )
 
         if interactive:
@@ -630,47 +979,6 @@ class vagrantFileStdout(icm.Cmnd):
             opError=icm.OpError.Success,
             opResults=resStr
         )
-
-####+BEGIN: bx:icm:python:func :funcName "offlineimaprcTemplate" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /offlineimaprcTemplate/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
-"""
-def offlineimaprcTemplate():
-####+END:
-    templateStr = """ 
-[general]
-accounts = MyAccount
-#pythonfile = .offlineimap.py
-
-[Account MyAccount]
-localrepository = LocalIMAP
-remoterepository = RemoteIMAP
-# autorefresh = 5
-# postsynchook = notmuch new
-
-[Repository LocalIMAP]
-type = Maildir
-localfolders = {inMailAcctMboxesPath}
-
-[Repository RemoteIMAP]
-type = IMAP
-sslcacertfile = /etc/ssl/certs/ca-certificates.crt
-remotehost = {imapServer}
-remoteuser = {userName}
-remotepass = {userPasswd}
-ssl = {ssl}
-nametrans = lambda name: re.sub('^INBOX.', '', name)
-{folderFilterLine}
-# folderfilter = lambda name: name in [ {foldersListStr} ]
-# folderfilter = lambda name: not (name in [ 'INBOX.spam', 'INBOX.commits' ])
-# holdconnectionopen = yes
-# maxconnections = 3
-# foldersort = lld_cmp
-
-"""
-    return templateStr
-
-
     
 
 ####+BEGIN: bx:icm:python:section :title "Supporting Classes And Functions"
@@ -682,14 +990,14 @@ nametrans = lambda name: re.sub('^INBOX.', '', name)
 
 ####+BEGIN: bx:icm:python:section :title "Obtain ICM-Package Anchor For General Execution"
 """
-*  [[elisp:(beginning-of-buffer)][Top]] ################ [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Obtain ICM-Package Anchor For General Execution*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+*  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Obtain ICM-Package Anchor For General Execution*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
 
 
 ####+BEGIN: bx:icm:python:func :funcName "pkgAnchor_configDir_obtain" :funcType "anyOrNone" :retType "str(path)" :deco "" :argsList ""
 """
-*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(org-tree-to-indirect-buffer)][|>]] [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Func-anyOrNone :: /pkgAnchor_configDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgAnchor_configDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
 """
 def pkgAnchor_configDir_obtain():
 ####+END:
@@ -698,26 +1006,35 @@ def pkgAnchor_configDir_obtain():
 
 ####+BEGIN: bx:icm:python:func :funcName "pkgAnchor_baseDir_obtain" :funcType "anyOrNone" :retType "str(path)" :deco "" :argsList ""
 """
-*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(org-tree-to-indirect-buffer)][|>]] [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Func-anyOrNone :: /pkgAnchor_baseDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgAnchor_baseDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
 """
 def pkgAnchor_baseDir_obtain():
 ####+END:
     return (
-            bootstrapPkgThis.pkgBase_baseDir()
+        bootstrapPkgThis.pkgBase_moduleDir()
     )
 
 
-####+BEGIN: bx:icm:python:func :funcName "BaseDirGet" :funcType "anyOrNone" :retType "str(path)" :deco "" :argsList ""
+####+BEGIN: bx:icm:python:func :funcName "pkgAnchor_vagrantsDir_obtain" :funcType "anyOrNone" :retType "str(path)" :deco "" :argsList ""
 """
-*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(org-tree-to-indirect-buffer)][|>]] [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Func-anyOrNone :: /inputsBaseDirGet/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgAnchor_vagrantsDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
 """
-def inputsBaseDirGet():
+def pkgAnchor_vagrantsDir_obtain():
 ####+END:
     return (
-        icmsPkgLib.pkgInputsBaseDir_obtain(
-            pkgAnchor_baseDir_obtain()
-        )
+        bootstrapPkgThis.pkgBase_vagrantsDir()
     )
+
+####+BEGIN: bx:icm:python:func :funcName "pkgAnchor_genReposSpecDir_obtain" :funcType "anyOrNone" :retType "str(path)" :deco "" :argsList ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgAnchor_genReposSpecDir_obtain/ retType=str(path) argsList=nil  [[elisp:(org-cycle)][| ]]
+"""
+def pkgAnchor_genReposSpecDir_obtain():
+####+END:
+    return (
+        bootstrapPkgThis.pkgBase_genReposSpecDir()
+    )
+
     
 ####+BEGIN: bx:icm:python:section :title "Common/Generic Facilities -- Library Candidates"
 """

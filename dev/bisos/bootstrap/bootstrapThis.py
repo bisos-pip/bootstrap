@@ -190,34 +190,6 @@ def pkgBase_configDir():
     icmsPkgBaseDir = "{}-config".format(icmsModulePath)
     return icmsPkgBaseDir
 
-
-
-####+BEGIN: bx:icm:python:func :funcName "pkgBase_vagrantsDir" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgBase_vagrantsDir/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
-"""
-def pkgBase_vagrantsDir():
-####+END:
-    """
-** Return the icmsPkg's base data directory
-"""
-    icmsModulePath = os.path.dirname(__file__)
-    icmsPkgBaseDir = "{}-vagrants".format(icmsModulePath)
-    return icmsPkgBaseDir
-
-####+BEGIN: bx:icm:python:func :funcName "pkgBase_genReposSpecDir" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgBase_genReposSpecDir/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
-"""
-def pkgBase_genReposSpecDir():
-####+END:
-    """
-** Return the icmsPkg's base data directory
-"""
-    icmsModulePath = os.path.dirname(__file__)
-    icmsPkgBaseDir = "{}-genReposSpec".format(icmsModulePath)
-    return icmsPkgBaseDir
-
     
 
 ####+BEGIN: bx:icm:python:section :title "End Of Editable Text"

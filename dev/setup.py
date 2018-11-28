@@ -17,7 +17,7 @@ def longDescription():
 
 
 #__version__ = get_version('unisos/icm/__init__.py')
-__version__ = '0.7'
+__version__ = '0.8'
 
 
 requires = [
@@ -30,6 +30,10 @@ requires = [
 scripts = [
     "./bin/bx2Genesis.sh",
     "./bin/bxBootstrapGuest.sh",
+    "./bin/bisosBaseDirSetup.sh",
+    "./bin/bisosMarmeInstall.sh",
+    "./bin/bisosPkgInstall.sh",
+    "./bin/foreignBxoBaseSetup.sh",    
     # Perhaps vagrant files should come here.
 ]
 

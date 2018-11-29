@@ -93,7 +93,7 @@ from blee.icmPlayer import bleep
 
 g_importedCmnds = {        # Enumerate modules from which CMNDs become invokable
     'bleep': bleep.__file__,
-    #'marmeAcctsLib': marmeAcctsLib.__file__,    
+    'bootstrapPkgThis': bootstrapPkgThis.__file__, 
 }
 
 
@@ -381,44 +381,71 @@ class examples(icm.Cmnd):
 
         bleep.examples_icmBasic()
 
-        
-####+BEGIN: bx:icm:python:cmnd:subSection :title "Dev And Testing"
+####+BEGIN: bx:icm:python:cmnd:subSection :title "This Package Bases"
         """
-**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Dev And Testing*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *This Package Bases*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
-        #icm.cmndExampleMenuChapter('*General Dev and Testing IIFs*')
+        icm.cmndExampleMenuChapter('*This Package Bases*')
 
-        icm.cmndExampleMenuChapter('*Config File Creation Facility IIFs*')
+        cmndName = "thisPkgBases" ;  cmndArgs = ""
+        cps=cpsInit()
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
 
-        cmndName = "offlineimaprcUpdate" ;  cmndArgs = ""
-	cps=cpsInit(); #cmndParsCurBxoSr(cps); 
-	menuItem(verbosity='none') ; menuItem(verbosity='full')
-
-        cmndName = "offlineimaprcStdout" ;  cmndArgs = ""
-	cps=cpsInit(); #cmndParsCurBxoSr(cps); 
-	menuItem(verbosity='none') ; menuItem(verbosity='full')
-
-        # configFile = withInMailDomGetOfflineimaprcPath(
-        #     controlProfile,
-        #     defaultMailDom,
-        #     curGet_bxoId(),
-        #     curGet_sr(),
-        # )
-
-
-        configFile="someConfigFile"
-        
-        icm.ANN_write(
-            """ls -l {}""".format(configFile)
-        )
-        icm.ANN_write(
-            """cat  {} """.format(configFile)
-        )
+        cmndName = "thisPkgCommand" ;  cmndArgs = ""
+        cps=cpsInit()
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
         
 
-        # marmeAcctsLib.examples_inMailAcctAccessPars()
-        
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Prepare The Host To Run Vagrant (VirtualBox Setup etc)"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Prepare The Host To Run Vagrant (VirtualBox Setup etc)*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Prepare The Host To Run Vagrant (VirtualBox Setup etc)*')
+
+        cmndName = "vagrantHostPrep" ;  cmndArgs = ""
+        cps=cpsInit()
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Run Vagrant File (Perhaps Build The File)"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Run Vagrant File (Perhaps Build The File)*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Run Vagrant File (Perhaps Build The File)*')
+
+        cmndName = "vagrantFileUpdateRun" ;  cmndArgs = ""
+        cps=cpsInit()
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+        cmndName = "vagrantFileRun" ;  cmndArgs = ""
+        cps=cpsInit() #cmndParsCurBxoSr(cps)
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Vagrant File"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Vagrant File*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Create (Update) Vagrant File*')
+
+        cmndName = "vagrantFileUpdate" ;  cmndArgs = ""
+        cps=cpsInit() #cmndParsCurBxoSr(cps); 
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+        cmndName = "vagrantFileName" ;  cmndArgs = ""
+        cps=cpsInit() #cmndParsCurBxoSr(cps); 
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+        cmndName = "vagrantFileTemplate" ;  cmndArgs = ""
+        cps=cpsInit() #cmndParsCurBxoSr(cps); 
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+        cmndName = "vagrantFileStdout" ;  cmndArgs = ""
+        cps=cpsInit() #cmndParsCurBxoSr(cps); 
+        menuItem(verbosity='none') #; menuItem(verbosity='full')
+
 
 ####+BEGIN: bx:icm:python:section :title "ICM Commands"
 """
@@ -537,11 +564,11 @@ class vagrantFileUpdateRun(icm.Cmnd):
 
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileBuildAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileBuildAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class vagrantFileRun(icm.Cmnd):
+class vagrantFileBuildAndRun(icm.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}

@@ -69,7 +69,7 @@ function fbxoBaseSetup {
     #
     #if ! which bx-platformInfoManage.py > /dev/null ; then
 
-    local bx_platformInfoManage="/usr/local/bin/bx-platformInfoManage.py"
+    local bx_platformInfoManage=$( which -a bx-platformInfoManage.py | grep -v venv | head -1 )
 
     if [ ! -f "${bx_platformInfoManage}" ] ; then 
 	echoErr "Missing ${bx_platformInfoManage}"

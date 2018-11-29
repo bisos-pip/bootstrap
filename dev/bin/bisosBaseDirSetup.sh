@@ -11,7 +11,7 @@ function bisosBaseDirSetup {
 
     local bisosRoot="/bisos"
 
-    if [ $( type -t deactivate ) == "function" ] ; then
+    if [ "$( type -t deactivate )" == "function" ] ; then
 	deactivate
     fi
 
@@ -22,7 +22,7 @@ function bisosBaseDirSetup {
     sudo mkdir -p "${bisosRoot}"
     sudo chown -R ${currentUser}:${currentUserGroup} "${bisosRoot}"
 
-    sudo -H pip install --no-cache-dir --upgrade bisos.bx-bases
+    sudo -H pip install --no-cache-dir --upgrade --force-reinstall bisos.bx-bases
 
     bx-bases -v 20 --baseDir="${bisosRoot}" -i pbdUpdate all
 }

@@ -5,6 +5,12 @@ function echoAnn { echo "A: $@" 1>&2; }
 function echoOut { echo "$@"; }
 
 
+function bisosFoundationPkgsInstall {
+    pip install --no-cache-dir --upgrade unisos.common
+    pip install --no-cache-dir --upgrade bisos.common
+    pip install --no-cache-dir --upgrade bisos.bx-bases    
+}
+
 function bisosPkgInstall {
 
     if [ $# -ne 2 ] ; then
@@ -23,6 +29,8 @@ function bisosPkgInstall {
 
     source ${virtEnv}/bin/activate
 
+    bisosFoundationPkgsInstall    
+    
     pip install --no-cache-dir --upgrade "${pkgName}"
 }
 

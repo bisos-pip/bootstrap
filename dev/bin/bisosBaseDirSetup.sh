@@ -19,12 +19,19 @@ function bisosBaseDirSetup {
 
     sudo -H pip install --no-cache-dir --upgrade virtualenv
 
-    sudo mkdir -p "${bisosRoot}"
-    sudo chown -R ${currentUser}:${currentUserGroup} "${bisosRoot}"
-
     sudo -H pip install --no-cache-dir --upgrade --force-reinstall bisos.bx-bases
 
+    sudo mkdir -p "${bisosRoot}"
+    sudo chown -R ${currentUser}:${currentUserGroup} "${bisosRoot}"
     bx-bases -v 20 --baseDir="${bisosRoot}" -i pbdUpdate all
+
+    sudo mkdir -p "/de"
+    sudo chown -R ${currentUser}:${currentUserGroup} "/de"
+    bx-bases -v 20 --baseDir="/de" --pbdName="deRunRoot"  -i pbdUpdate all
+
+    sudo mkdir -p "/bxo"
+    sudo chown -R ${currentUser}:${currentUserGroup} "/bxo"
+    bx-bases -v 20 --baseDir="/bxo" --pbdName="bxoRoot"  -i pbdUpdate all
 }
 
 bisosBaseDirSetup

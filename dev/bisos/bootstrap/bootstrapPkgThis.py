@@ -167,23 +167,32 @@ This module is part of BISOS and its primary documentation is in  http://www.by-
 ####+END:
 
 
-####+BEGIN: bx:icm:python:func :funcName "examples_deliveryTrackings" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
+####+BEGIN: bx:icm:python:func :funcName "examples_pkgThis" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /examples_deliveryTrackings/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /examples_pkgThis/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
 """
-def examples_deliveryTrackings():
+def examples_pkgThis():
 ####+END:
     """."""
-    
+
     def cpsInit(): return collections.OrderedDict()
     def menuItem(verbosity): icm.ex_gCmndMenuItem(cmndName, cps, cmndArgs, verbosity=verbosity) # 'little' or 'none'
     def execLineEx(cmndStr): icm.ex_gExecMenuItem(execLine=cmndStr)
-    
-    icm.cmndExampleMenuChapter('* =INFO=  Delivery Trackings Show*')
 
-    cmndName = "deliveryTrackingsShow" ; cmndArgs = ""
-    cps=cpsInit(); cmndParsCurBxoSr(cps);
-    menuItem(verbosity='none') ;  menuItem(verbosity='little')
+####+BEGIN: bx:icm:python:cmnd:subSection :title "This Package Bases" :context "func-1"
+    """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *This Package Bases*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+    icm.cmndExampleMenuChapter('*This Package Bases*')
+
+    cmndName = "thisPkgBases" ;  cmndArgs = ""
+    cps=cpsInit()
+    menuItem(verbosity='none') #; menuItem(verbosity='full')
+
+    # cmndName = "thisPkgCommand" ;  cmndArgs = ""
+    # cps=cpsInit()
+    # menuItem(verbosity='none') #; menuItem(verbosity='full')
 
     return
 

@@ -94,11 +94,11 @@ G.icmCmndsLibsAppend = __file__
 ####+END:
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "thisPkgPlatform_libOverview" :comment "" :parsMand "" :parsOpt "" :argsMin "0" :argsMax "3" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "pkgThis_libOverview" :comment "" :parsMand "" :parsOpt "" :argsMin "0" :argsMax "3" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /thisPkgPlatform_libOverview/ parsMand= parsOpt= argsMin=0 argsMax=3 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /pkgThis_libOverview/ parsMand= parsOpt= argsMin=0 argsMax=3 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class thisPkgPlatform_libOverview(icm.Cmnd):
+class pkgThis_libOverview(icm.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ ]
     cmndArgsLen = {'Min': 0, 'Max': 3,}
@@ -147,17 +147,42 @@ This module is part of BISOS and its primary documentation is in  http://www.by-
 ** TODO [[elisp:(org-cycle)][| ]]  Current         :: Just getting started [[elisp:(org-cycle)][| ]]
 **      [End-Of-Status]
 """
-        cmndArgsSpec = {"0&-1": ['moduleDescription', 'moduleUsage', 'moduleStatus']}
-        cmndArgsValid = cmndArgsSpec["0&-1"]
-        for each in effectiveArgsList:
-            if each in cmndArgsValid:
-                print each
-                if interactive:
-                    #print( str( __doc__ ) )  # This is the Summary: from the top doc-string
-                    #version(interactive=True)
-                    exec("""print({})""".format(each))
+####+BEGIN: bx:dblock:global:file-insert-cond :cond "./blee.el" :file "/libre/ByStar/InitialTemplates/update/sw/icm/py/moduleOverview.py"
+        icm.unusedSuppressForEval(moduleUsage, moduleStatus)
+        actions = self.cmndArgsGet("0&2", cmndArgsSpecDict, effectiveArgsList)
+        if actions[0] == "all":
+            cmndArgsSpec = cmndArgsSpecDict.argPositionFind("0&2")
+            argChoices = cmndArgsSpec.argChoicesGet()
+            argChoices.pop(0)
+            actions = argChoices
+        for each in actions:
+            print each
+            if interactive:
+                #print( str( __doc__ ) )  # This is the Summary: from the top doc-string
+                #version(interactive=True)
+                exec("""print({})""".format(each))
                 
         return(format(str(__doc__)+moduleDescription))
+
+    """
+**  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(org-tree-to-indirect-buffer)][|>]] [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Method-anyOrNone :: /cmndArgsSpec/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndArgsSpec(self):
+        """
+***** Cmnd Args Specification
+"""
+        cmndArgsSpecDict = icm.CmndArgsSpecDict()
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="0&2",
+            argName="actions",
+            argDefault='all',
+            argChoices=['all', 'moduleDescription', 'moduleUsage', 'moduleStatus'],
+            argDescription="Output relevant information",
+        )
+
+        return cmndArgsSpecDict
+####+END:
 
 
 ####+BEGIN: bx:icm:python:section :title "Common Examples Section"
@@ -165,7 +190,6 @@ This module is part of BISOS and its primary documentation is in  http://www.by-
 *  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Common Examples Section*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
-
 
 ####+BEGIN: bx:icm:python:func :funcName "examples_pkgThis" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
 """
@@ -187,13 +211,11 @@ def examples_pkgThis():
     icm.cmndExampleMenuChapter('*This Package Bases*')
 
     cmndName = "thisPkgBases" ;  cmndArgs = ""
-    cps=cpsInit()
-    menuItem(verbosity='none') #; menuItem(verbosity='full')
+    cps=cpsInit() ; menuItem(verbosity='none')
 
-    # cmndName = "thisPkgCommand" ;  cmndArgs = ""
-    # cps=cpsInit()
-    # menuItem(verbosity='none') #; menuItem(verbosity='full')
-
+    cmndName = "thisPkgBases" ;  cmndArgs = "pkgBase_baseDir"
+    cps=cpsInit() ; menuItem(verbosity='none')
+    
     return
 
 
@@ -290,9 +312,9 @@ class thisPkgBases(icm.Cmnd):
 """
 ####+END:
 
-####+BEGIN: bx:icm:python:func :funcName "pkgBase_moduleDir" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
+####+BEGIN: bx:icm:python:func :funcName "pkgBase_modulesDir" :funcType "anyOrNone" :retType "bool" :deco "" :argsList ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgBase_moduleDir/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /pkgBase_modulesDir/ retType=bool argsList=nil  [[elisp:(org-cycle)][| ]]
 """
 def pkgBase_modulesDir():
 ####+END:

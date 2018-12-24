@@ -828,29 +828,62 @@ class vagrantFileTemplate(icm.Cmnd):
 
         vagrantsBaseDir = pkgAnchor_vagrantsDir_obtain()
 
-        vagrantTemplateFile = os.path.join(
+        vagrantTemplateBase = os.path.join(
             vagrantsBaseDir,
             distroName,
             distroVersion,
             distroFlavor,
             vmConfig,
             genWithRepoSpec,
-            "vagrantfile.template"
         )
 
-        if not os.path.isfile(vagrantTemplateFile):
+        vagrantTemplateHead = os.path.join(
+            vagrantTemplateBase,
+            "template-head.ruby",
+        )
+
+        if not os.path.isfile(vagrantTemplateHead):
             return(icm.EH_badOutcome(outcome))
 
+        vagrantTemplateMain = os.path.join(
+            vagrantTemplateBase,
+            "template-main.bash",
+        )
 
+        if not os.path.isfile(vagrantTemplateMain):
+            return(icm.EH_badOutcome(outcome))
+
+        vagrantTemplateTail = os.path.join(
+            vagrantTemplateBase,
+            "template-tail.bashRuby",
+        )
+
+        if not os.path.isfile(vagrantTemplateTail):
+            return(icm.EH_badOutcome(outcome))
+
+            
         if interactive:
             icm.ANN_write(
             """{vagrantTemplateFile}"""
-            .format(vagrantTemplateFile=vagrantTemplateFile)
+            .format(vagrantTemplateFile=vagrantTemplateHead)
             )
+            icm.ANN_write(            
+            """{vagrantTemplateFile}"""
+            .format(vagrantTemplateFile=vagrantTemplateMain)
+            )
+            icm.ANN_write(                        
+            """{vagrantTemplateFile}"""
+            .format(vagrantTemplateFile=vagrantTemplateTail)
+            )
+
+        opResults = dict()
+        opResults['head'] = vagrantTemplateHead
+        opResults['main'] = vagrantTemplateMain
+        opResults['tail'] = vagrantTemplateTail        
             
         return cmndOutcome.set(
             opError=icm.OpError.Success,
-            opResults=vagrantTemplateFile
+            opResults=opResults
         )
 
 
@@ -899,22 +932,35 @@ class vagrantFileStdout(icm.Cmnd):
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
-        vagrantTemplateFilePath = outcome.results
+        vagrantTemplateFilesDict = outcome.results
 
         genReposSpecBaseDir = pkgAnchor_genReposSpecDir_obtain()
 
-        if not os.path.isfile(vagrantTemplateFilePath):
-            return(icm.EH_badOutcome(outcome))
+        vagrantTemplateHead = vagrantTemplateFilesDict['head']
+        vagrantTemplateMain = vagrantTemplateFilesDict['main']
+        vagrantTemplateTail = vagrantTemplateFilesDict['tail']                
+        
+        if not os.path.isfile(vagrantTemplateHead): return(icm.EH_badOutcome(outcome))
+        with open (vagrantTemplateHead, "r") as myfile:
+            vagrantTemplateHeadStr = myfile.read()
 
-        with open (vagrantTemplateFilePath, "r") as myfile:
-            vagrantTemplateStr = myfile.read()
+        if not os.path.isfile(vagrantTemplateMain): return(icm.EH_badOutcome(outcome))            
+        with open (vagrantTemplateMain, "r") as myfile:
+            vagrantTemplateMainStr = myfile.read()
 
+        if not os.path.isfile(vagrantTemplateTail): return(icm.EH_badOutcome(outcome))                        
+        with open (vagrantTemplateTail, "r") as myfile:
+            vagrantTemplateTailStr = myfile.read()
+
+        vagrantTemplateStr = vagrantTemplateHeadStr + vagrantTemplateMainStr + vagrantTemplateTailStr
+            
+            
         # icm.ANN_write(
         #     """vagrantsBaseDir= {vagrantsBaseDir} --- genReposSpecBaseDir= {genReposSpecBaseDir}"""
 	    # .format(vagrantsBaseDir=vagrantsBaseDir, genReposSpecBaseDir=genReposSpecBaseDir)
         # )
 
-        verNu = vmNameVerNuObtain(vagrantTemplateFilePath)
+        verNu = vmNameVerNuObtain(vagrantTemplateHead)
 
         vmName = vmNameObtain(
             distroName=distroName,

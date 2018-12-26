@@ -17,7 +17,7 @@ def longDescription():
 
 
 #__version__ = get_version('unisos/icm/__init__.py')
-__version__ = '0.15'
+__version__ = '0.19'
 
 
 requires = [
@@ -27,7 +27,6 @@ requires = [
     'bisos.common',
     'bisos.platform',
     'blee.icmPlayer',
-    'unisos.marme',            # NOTYET, PROBLEM, should not be necessary
 ]
 
 

@@ -368,8 +368,10 @@ class examples(icm.Cmnd):
             return cmndOutcome
 
 ####+END:
+
+
         def cpsInit(): return collections.OrderedDict()
-	def menuItem(verbosity): icm.ex_gCmndMenuItem(cmndName, cps, cmndArgs, verbosity=verbosity) # 'little' or 'none'
+        def menuItem(verbosity): icm.ex_gCmndMenuItem(cmndName, cps, cmndArgs, verbosity=verbosity) # 'little' or 'none'            
         def execLineEx(cmndStr): icm.ex_gExecMenuItem(execLine=cmndStr)
 
         logControler = icm.LOG_Control()
@@ -380,6 +382,7 @@ class examples(icm.Cmnd):
         icm.G_commonBriefExamples()    
 
         bleep.examples_icmBasic()
+
 
 ####+BEGIN: bx:icm:python:cmnd:subSection :title "This Package Bases"
         """
@@ -396,46 +399,86 @@ class examples(icm.Cmnd):
         icm.cmndExampleMenuChapter('*Prepare The Host To Run Vagrant (VirtualBox Setup etc)*')
 
         cmndName = "vagrantHostPrep" ;  cmndArgs = ""
-        cps=cpsInit()
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; menuItem(verbosity='none')
 
-####+BEGIN: bx:icm:python:cmnd:subSection :title "Run Vagrant File (Perhaps Build The File)"
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Run Vagrant File (Perhaps Build The File) -- As Specified"
         """
-**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Run Vagrant File (Perhaps Build The File)*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Run Vagrant File (Perhaps Build The File) -- As Specified*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
-        icm.cmndExampleMenuChapter('*Run Vagrant File (Perhaps Update The File)*')
+        icm.cmndExampleMenuChapter('*Run Vagrant File (Perhaps Update The File) -- As Specified*')
+
+        def cpsCommonParsSet(cps):
+            cps['distroName'] = "ubuntu"
+            cps['distroVersion'] = "18.04"
+            cps['distroFlavor'] = "desktop"
+            cps['vmConfig'] = "medium-nat"
+            cps['genWithRepoSpec'] = "bxContainer"                                    
+            return cps
 
         cmndName = "vagrantFileUpdateAndRun" ;  cmndArgs = ""
-        cps=cpsInit()
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
 
         cmndName = "vagrantFileRun" ;  cmndArgs = ""
-        cps=cpsInit() #cmndParsCurBxoSr(cps)
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
 
-####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Vagrant File"
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Vagrant File -- As Specified"
         """
 **  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Vagrant File*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
-        icm.cmndExampleMenuChapter('*Create (Update) Vagrant File*')
+        icm.cmndExampleMenuChapter('*Create (Update) Vagrant File -- As Specified*')
 
         cmndName = "vagrantFileUpdate" ;  cmndArgs = ""
-        cps=cpsInit() #cmndParsCurBxoSr(cps); 
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
 
         cmndName = "vagrantFileName" ;  cmndArgs = ""
-        cps=cpsInit() #cmndParsCurBxoSr(cps); 
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
 
         cmndName = "vagrantFileTemplate" ;  cmndArgs = ""
-        cps=cpsInit() #cmndParsCurBxoSr(cps); 
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
 
         cmndName = "vagrantFileStdout" ;  cmndArgs = ""
-        cps=cpsInit() #cmndParsCurBxoSr(cps); 
-        menuItem(verbosity='none') #; menuItem(verbosity='full')
+        cps=cpsInit() ; cpsCommonParsSet(cps)
+        menuItem(verbosity='none')
+
+
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Run Vagrant File (Perhaps Build The File) -- With Defaults"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Run Vagrant File (Perhaps Build The File) -- With Defaults*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Run Vagrant File (Perhaps Update The File) -- With Defaults*')
+
+        cmndName = "vagrantFileUpdateAndRun" ;  cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
+
+        cmndName = "vagrantFileRun" ;  cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
+
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Vagrant File -- With Defaults"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Vagrant File -- With Defaults*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Create (Update) Vagrant File -- With Defaults*')
+
+        cmndName = "vagrantFileUpdate" ; cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
+
+        cmndName = "vagrantFileName" ; cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
+
+        cmndName = "vagrantFileTemplate" ; cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
+
+        cmndName = "vagrantFileStdout" ; cmndArgs = ""
+        cps=cpsInit() ; menuItem(verbosity='none')
 
 
 ####+BEGIN: bx:icm:python:section :title "ICM Commands"
@@ -611,13 +654,13 @@ class vagrantFileRun(icm.Cmnd):
 
 
         outcome = icm.subProc_bash("""\
-echo VAGRANT_VAGRANTFILE={vagrantFile} vagrant"""
+VAGRANT_VAGRANTFILE={vagrantFile} vagrant up"""
                                      .format(vagrantFile=vagrantFile)
         ).log()
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
         stdOut = outcome.stdout; stdErr = outcome.stderr; stdExit = outcome.error
 
-        print(stdOut); print(stdErr); print(stdExit)
+        #print(stdOut); print(stdErr); print(stdExit)
         
         # environment variables -- VAGRANT_VAGRANTFILE        
 
@@ -1007,8 +1050,12 @@ def vmNameObtain(
 ):
 ####+END:
     
-    vmName = "{distroName}-zz{verNu}".format(
+    vmName = "{distroName}-{distroVersion}-{distroFlavor}-{vmConfig}-{genWithRepoSpec}-{verNu}".format(
         distroName=distroName,
+        distroVersion=distroVersion,
+        distroFlavor=distroFlavor,
+        vmConfig=vmConfig,
+        genWithRepoSpec=genWithRepoSpec,
         verNu=verNu,
         )
     return vmName

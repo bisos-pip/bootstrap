@@ -17,12 +17,17 @@ def longDescription():
 
 
 #__version__ = get_version('unisos/icm/__init__.py')
-__version__ = '0.13'
+__version__ = '0.15'
 
 
 requires = [
     'unisos.ucf',
     'unisos.icm',
+    'unisos.common',
+    'bisos.common',
+    'bisos.platform',
+    'blee.icmPlayer',
+    'unisos.marme',            # NOTYET, PROBLEM, should not be necessary
 ]
 
 

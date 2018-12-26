@@ -841,7 +841,10 @@ class vagrantFileTemplate(icm.Cmnd):
             vagrantTemplateBase,
             "template-head.ruby",
         )
-
+        
+        outcome = self.getOpOutcome()
+        outcome.set(opErrInfo=vagrantTemplateBase,)
+        
         if not os.path.isfile(vagrantTemplateHead):
             return(icm.EH_badOutcome(outcome))
 

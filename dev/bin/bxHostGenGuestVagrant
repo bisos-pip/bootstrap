@@ -564,14 +564,14 @@ class vagrantHostPrep(icm.Cmnd):
 
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdateAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdateAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdateAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdateAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
 class vagrantFileUpdateAndRun(icm.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 0,}
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
     def cmnd(self,
@@ -581,11 +581,15 @@ class vagrantFileUpdateAndRun(icm.Cmnd):
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
         genWithRepoSpec=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
 
         callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
@@ -596,43 +600,34 @@ class vagrantFileUpdateAndRun(icm.Cmnd):
         vmConfig = callParamsDict['vmConfig']
         genWithRepoSpec = callParamsDict['genWithRepoSpec']
 
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
 ####+END:
 
-        outcome = vagrantFileStdout().cmnd(
+        outcome = vagrantFileUpdate().cmnd(
             interactive=False,
             distroName=distroName,
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
             genWithRepoSpec=genWithRepoSpec,
+            argsList=argsList,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
-        resStr = outcome.results
-
-        outcome = generatedFileName().cmnd(
+        outcome = vagrantFileRun().cmnd(
             interactive=False,
             distroName=distroName,
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
             genWithRepoSpec=genWithRepoSpec,
-            argsList=['Vagrantfile',],
+            argsList=argsList,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-        
-        resFilePath = outcome.results[0]
 
-        with open(resFilePath, "w") as thisFile:
-            thisFile.write(resStr + '\n')
-
-        if interactive:
-            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
-        
-        return cmndOutcome.set(
-            opError=icm.OpError.Success,
-            opResults=resFilePath,
-        )
+        return outcome
 
 
 
@@ -696,7 +691,7 @@ class vagrantFileRun(icm.Cmnd):
         vagrantFile = outcome.results[0]
 
         cmnd = """\
-echo YYY VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
+VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
 """.format(vagrantFile=vagrantFile)
 
         result = shRun.bash(cmnd, hide=False, warn=True, echo=True)
@@ -705,7 +700,7 @@ echo YYY VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
 
         return cmndOutcome.set(
             opError=icm.OpError.Success,
-            opResults=None,
+            opResults=result,
         )
     
 
@@ -742,14 +737,14 @@ echo YYY VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
 """
 
     
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
 class vagrantFileUpdate(icm.Cmnd):
     cmndParamsMandatory = [ ]
     cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 0,}
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
     def cmnd(self,
@@ -759,11 +754,15 @@ class vagrantFileUpdate(icm.Cmnd):
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
         genWithRepoSpec=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
 
         callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
@@ -774,6 +773,9 @@ class vagrantFileUpdate(icm.Cmnd):
         vmConfig = callParamsDict['vmConfig']
         genWithRepoSpec = callParamsDict['genWithRepoSpec']
 
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
 ####+END:
 
         outcome = vagrantFileStdout().cmnd(

@@ -80,7 +80,7 @@ G.icmCmndsLibsAppend = __file__
 
 ####+END:
 
-from unisos.common import icmsPkgLib
+#from unisos.common import icmsPkgLib
 
 from bisos.bootstrap import bootstrapPkgThis
 
@@ -460,10 +460,10 @@ class examples(icm.Cmnd):
         cmndName = "vagrantFileUpdateAndRun" ;  cmndArgs = ""
         cps=cpsInit() ; menuItem(verbosity='none')
 
-        cmndName = "vagrantFileRun" ;  cmndArgs = ""
+        cmndName = "vagrantFileRun" ;  cmndArgs = "up"
         cps=cpsInit() ; menuItem(verbosity='none')
 
-        cmndName = "vagrantFileRunWithInvoke" ;  cmndArgs = ""
+        cmndName = "vagrantFileRunWithInvoke" ;  cmndArgs = "up"
         cps=cpsInit() ; menuItem(verbosity='none')
         
 ####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Vagrant File -- With Defaults"
@@ -771,9 +771,10 @@ class vagrantFileRunWithInvoke(icm.Cmnd):
 
 
         cmnd = """\
-cat /etc/motd;
-sleep 5;
-echo ZZZ VAGRANT_VAGRANTFILE={vagrantFile} vagrant up""".format(vagrantFile=vagrantFile)
+VAGRANT_VAGRANTFILE={vagrantFile} vagrant {cmndArgs}""".format(
+                      vagrantFile=vagrantFile,
+                      cmndArgs=" ".join(cmndArgs),
+        )
 
         #result = run(cmnd, hide=True, warn=True)
         result = run(cmnd, hide=False, warn=True, echo=True)        

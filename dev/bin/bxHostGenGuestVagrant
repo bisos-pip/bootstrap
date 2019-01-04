@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """\
-* TODO *[Summary]* :: An =ICM=: Retrieve message with offlineimap from imap server
+* TODO *[Summary]* :: An =ICM=: To be executed on a host capable of guest generation 
 """
 
 ####+BEGIN: bx:icm:python:top-of-file :partof "bystar" :copyleft "halaal+minimal"
@@ -93,9 +93,7 @@ from blee.icmPlayer import bleep
 
 from unisos.utils import shRun
 
-from invoke import run
-
-
+#from invoke import run
 
 g_importedCmnds = {        # Enumerate modules from which CMNDs become invokable
     'bleep': bleep.__file__,
@@ -146,7 +144,7 @@ class icmOverview(icm.Cmnd):
 **  [[elisp:(org-cycle)][| ]]  [Xref]          :: *[Related/Xrefs:]*  <<Xref-Here->>  -- External Documents  [[elisp:(org-cycle)][| ]]
 
 **  [[elisp:(org-cycle)][| ]]	Model and Terminology 					   :Overview:
-*** See BISOS Documentation for ICM's model and terminology
+*** To be executed on a host capable of guest generation 
 **      [End-Of-Description]
 """
         
@@ -154,18 +152,19 @@ class icmOverview(icm.Cmnd):
 *       [[elisp:(org-show-subtree)][|=]]  [[elisp:(org-cycle)][| *Usage:* | ]]
 
 **      How-Tos:
-*** TODO Edit icmInfo to identify author, etc
-*** TODO Select ICM type in g_icmChars
-*** TODO Enhance g_argsExtraSpecify for your parameters
-*** TODO Add your Commands
-*** TODO Enhance Examples Cmnd
+***  On the host, run vagrantFileUpdateAndRun family of commands
+***  In the guest, run sysBootstrapFileRun family of commands.
 **      [End-Of-Usage]
 """
         
         moduleStatus="""
 *       [[elisp:(org-show-subtree)][|=]]  [[elisp:(org-cycle)][| *Status:* | ]]
 **  [[elisp:(org-cycle)][| ]]  [Info]          :: *[Current-Info:]* Status/Maintenance -- General TODO List [[elisp:(org-cycle)][| ]]
-** TODO [[elisp:(org-cycle)][| ]]  Current         :: Just getting started [[elisp:(org-cycle)][| ]]
+** [[elisp:(org-cycle)][| ]]  Current         :: Basic functionality is in place -- needs to evolve. [[elisp:(org-cycle)][| ]]
+** TODO [[elisp:(org-cycle)][| ]]  Layering         :: bxHostGenGuest can be layered on top of virtHostGenGuest. [[elisp:(org-cycle)][| ]]
+   SCHEDULED: <2019-01-03 Thu>
+** TODO [[elisp:(org-cycle)][| ]]  Layering         :: Guest creation and system-bootstrap need to be split up. [[elisp:(org-cycle)][| ]]
+   SCHEDULED: <2019-01-03 Thu>
 **      [End-Of-Status]
 """
 
@@ -280,11 +279,42 @@ def g_argsExtraSpecify(
         argparseShortOpt=None,
         argparseLongOpt='--version',
     )
+    
+    bleep.commonParamsSpecify(icmParams)
 
+####+BEGINNOT: bx:icm:python:cmnd:subSection :title "Virtualization Wrappers And Types"
+    """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Virtualization Wrappers And Types*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
     
-    bleep.commonParamsSpecify(icmParams)    
+    icmParams.parDictAdd(
+        parName='virtWrapper',
+        parDescription="Virtualization Wrapper (vagrant, virsh)",
+        parDataType=None,
+        parDefault="vagrant",
+        parChoices=["vagrant", "visrh"],
+        parScope=icm.ICM_ParamScope.TargetParam,
+        argparseShortOpt=None,
+        argparseLongOpt='--virtWrapper',
+    )
     
-    #marmeAcctsLib.commonParamsSpecify(icmParams)
+    icmParams.parDictAdd(
+        parName='virtType',
+        parDescription="Virtualization Type (kvm, virtualBox)",
+        parDataType=None,
+        parDefault="virtualBox",
+        parChoices=["virtualBox", "kvm"],
+        parScope=icm.ICM_ParamScope.TargetParam,
+        argparseShortOpt=None,
+        argparseLongOpt='--virtType',
+    )
+
+####+BEGINNOT: bx:icm:python:cmnd:subSection :title "Guest Image Parameters"
+    """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Guest Image Parameters*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
     
     icmParams.parDictAdd(
         parName='distroName',
@@ -330,18 +360,52 @@ def g_argsExtraSpecify(
         argparseLongOpt='--vmConfig',
     )
 
+####+BEGINNOT: bx:icm:python:cmnd:subSection :title "System Configuration Labels"
+    """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *System Configuration Labels*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+
     icmParams.parDictAdd(
-        parName='genWithRepoSpec',
-        parDescription="Base Of Params For bxGenWithRepo",
+        parName='sysConfigLabels',
+        parDescription="System Configuration Labels",
         parDataType=None,
         parDefault="bxContainer",
-        parChoices=["bxContainer", "server"],
+        parChoices=["bxContainer", "bxDistro", "server",],
         parScope=icm.ICM_ParamScope.TargetParam,
         argparseShortOpt=None,
-        argparseLongOpt='--genWithRepoSpec',
+        argparseLongOpt='--sysConfigLabels',
     )
-    
-    
+
+
+####+BEGINNOT: bx:icm:python:cmnd:subSection :title "System Provisioners Obtain And Run"
+    """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *System Provisioners Obtain And Run*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+
+    icmParams.parDictAdd(
+        parName='sysProvisionerObtain',
+        parDescription="System Provisioner Obtain Command",
+        parDataType=None,
+        parDefault="",
+        parChoices=[],
+        parScope=icm.ICM_ParamScope.TargetParam,
+        argparseShortOpt=None,
+        argparseLongOpt='--sysProvisionerObtain',
+    )
+
+    icmParams.parDictAdd(
+        parName='sysProvisionerRun',
+        parDescription="System Provisioner Obtain Run",
+        parDataType=None,
+        parDefault="",
+        parChoices=[],
+        parScope=icm.ICM_ParamScope.TargetParam,
+        argparseShortOpt=None,
+        argparseLongOpt='--sysProvisionerRun',
+    )
+
        
     icm.argsparseBasedOnIcmParams(parser, icmParams)
 
@@ -408,9 +472,18 @@ class examples(icm.Cmnd):
             cps['distroVersion'] = "18.04"
             cps['distroFlavor'] = "desktop"
             cps['vmConfig'] = "medium-nat"
-            cps['genWithRepoSpec'] = "bxContainer"                                    
+            cps['sysConfigLabels'] = "bxContainer"                                    
             return cps
 
+        def cpsCommonParsSet_provisoner(cps):
+            cps['distroName'] = "ubuntu"
+            cps['distroVersion'] = "18.04"
+            cps['distroFlavor'] = "desktop"
+            cps['vmConfig'] = "medium-nat"
+            cps['sysProvisionerObtain'] = "git clone https:/github.com/bxBootstarp"
+            cps['sysProvisionerRun'] = "./bin/bxBootstrap -i bxContainer"                                                
+            return cps
+        
 
 ####+BEGIN: bx:icm:python:cmnd:subSection :title "Path To Templates And Generated File Names"
         """
@@ -430,7 +503,7 @@ class examples(icm.Cmnd):
         cmndName = "generatedFileName" ; cmndArgs = "Vagrantfile"
         cps=cpsInit() ;  cpsCommonParsSet(cps) ; menuItem(verbosity='none')
 
-        cmndName = "generatedFileName" ; cmndArgs = "guestBootstrapFile"
+        cmndName = "generatedFileName" ; cmndArgs = "sysBootstrapFile"
         cps=cpsInit() ;  cpsCommonParsSet(cps) ; menuItem(verbosity='none')
         
 
@@ -505,22 +578,40 @@ class examples(icm.Cmnd):
         cps=cpsInit() ; menuItem(verbosity='none')
 
 
-####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Guest Bootstrap File -- As Specified"
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Guest Bootstrap File -- With sysConfigLabels"
         """
-**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Vagrant File -- With Defaults*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Guest Bootstrap File -- With sysConfigLabels*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
-        icm.cmndExampleMenuChapter('*Create (Update) Guest Bootstrap File -- As Specified*')
+        icm.cmndExampleMenuChapter('*Create (Update) Guest Bootstrap File -- With sysConfigLabels*')
 
-        cmndName = "guestBootstrapFileRun" ; cmndArgs = ""
+        cmndName = "sysBootstrapFileRun" ; cmndArgs = ""
         cps=cpsInit() ; cpsCommonParsSet(cps) ; menuItem(verbosity='none')
         
-        cmndName = "guestBootstrapFileUpdate" ; cmndArgs = ""
+        cmndName = "sysBootstrapFileUpdate" ; cmndArgs = ""
         cps=cpsInit() ; cpsCommonParsSet(cps) ; menuItem(verbosity='none')
         
-        cmndName = "guestBootstrapFileStdout" ; cmndArgs = ""
+        cmndName = "sysBootstrapFileStdout" ; cmndArgs = ""
         cps=cpsInit() ;  cpsCommonParsSet(cps) ; menuItem(verbosity='none')
 
+
+####+BEGIN: bx:icm:python:cmnd:subSection :title "Create (Update) Guest Bootstrap File -- With sysProvisioner"
+        """
+**  [[elisp:(beginning-of-buffer)][Top]] ============== [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]          *Create (Update) Guest Bootstrap File -- With sysProvisioner*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+        icm.cmndExampleMenuChapter('*Create (Update) Guest Bootstrap File -- With sysProvisioner*')
+
+        cmndName = "sysBootstrapFileRun" ; cmndArgs = ""
+        cps=cpsInit() ; cpsCommonParsSet_provisoner(cps) ; menuItem(verbosity='none')
+        
+        cmndName = "sysBootstrapFileUpdate" ; cmndArgs = ""
+        cps=cpsInit() ; cpsCommonParsSet_provisoner(cps) ; menuItem(verbosity='none')
+        
+        cmndName = "sysBootstrapFileStdout" ; cmndArgs = ""
+        cps=cpsInit() ;  cpsCommonParsSet_provisoner(cps) ; menuItem(verbosity='none')
+
+        
 
 ####+BEGIN: bx:icm:python:section :title "ICM Commands"
 """
@@ -562,266 +653,20 @@ class vagrantHostPrep(icm.Cmnd):
             opResults=None,
         )
 
-
-
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdateAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:section :title "Templates And File Locations"
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdateAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Templates And File Locations*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
-class vagrantFileUpdateAndRun(icm.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 9999,}
-
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-        interactive=False,        # Can also be called non-interactively
-        distroName=None,         # or Cmnd-Input
-        distroVersion=None,         # or Cmnd-Input
-        distroFlavor=None,         # or Cmnd-Input
-        vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
-        argsList=[],         # or Args-Input
-    ):
-        cmndOutcome = self.getOpOutcome()
-        if interactive:
-            if not self.cmndLineValidate(outcome=cmndOutcome):
-                return cmndOutcome
-            effectiveArgsList = G.icmRunArgsGet().cmndArgs
-        else:
-            effectiveArgsList = argsList
-
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
-        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
-            return cmndOutcome
-        distroName = callParamsDict['distroName']
-        distroVersion = callParamsDict['distroVersion']
-        distroFlavor = callParamsDict['distroFlavor']
-        vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
-
-        cmndArgsSpecDict = self.cmndArgsSpec()
-        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
-            return cmndOutcome
 ####+END:
 
-        outcome = vagrantFileUpdate().cmnd(
-            interactive=False,
-            distroName=distroName,
-            distroVersion=distroVersion,
-            distroFlavor=distroFlavor,
-            vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=argsList,
-        )
-        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
-        outcome = vagrantFileRun().cmnd(
-            interactive=False,
-            distroName=distroName,
-            distroVersion=distroVersion,
-            distroFlavor=distroFlavor,
-            vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=argsList,
-        )
-        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-
-        return outcome
-
-
-
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileTemplate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
-"""
-class vagrantFileRun(icm.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 9999,}
-
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-        interactive=False,        # Can also be called non-interactively
-        distroName=None,         # or Cmnd-Input
-        distroVersion=None,         # or Cmnd-Input
-        distroFlavor=None,         # or Cmnd-Input
-        vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
-        argsList=[],         # or Args-Input
-    ):
-        cmndOutcome = self.getOpOutcome()
-        if interactive:
-            if not self.cmndLineValidate(outcome=cmndOutcome):
-                return cmndOutcome
-            effectiveArgsList = G.icmRunArgsGet().cmndArgs
-        else:
-            effectiveArgsList = argsList
-
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
-        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
-            return cmndOutcome
-        distroName = callParamsDict['distroName']
-        distroVersion = callParamsDict['distroVersion']
-        distroFlavor = callParamsDict['distroFlavor']
-        vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
-
-        cmndArgsSpecDict = self.cmndArgsSpec()
-        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
-            return cmndOutcome
-####+END:
-        #
-        # cmndArgs are in the form of name=value  to become additional vagrant env vars
-        #
-
-        cmndArgs = self.cmndArgsGet("0&9999", cmndArgsSpecDict, effectiveArgsList)
-
-        outcome = generatedFileName().cmnd(
-            interactive=False,
-            distroName=distroName,
-            distroVersion=distroVersion,
-            distroFlavor=distroFlavor,
-            vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=['Vagrantfile',],
-        )
-        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-        
-        vagrantFile = outcome.results[0]
-
-        cmnd = """\
-VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
-""".format(vagrantFile=vagrantFile)
-
-        result = shRun.bash(cmnd, hide=False, warn=True, echo=True)
-       
-        # environment variables -- VAGRANT_VAGRANTFILE        
-
-        return cmndOutcome.set(
-            opError=icm.OpError.Success,
-            opResults=result,
-        )
-    
-
-####+BEGIN: bx:icm:python:method :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
-    """
-**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndArgsSpec/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
-"""
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmndArgsSpec(self):
-####+END:        
-        """
-***** Cmnd Args Specification -- Each As Any.
-"""
-        cmndArgsSpecDict = icm.CmndArgsSpecDict()
-        cmndArgsSpecDict.argsDictAdd(
-            argPosition="0&9999",
-            argName="cmndArgs",
-            argChoices=[],
-            argDescription="List Of CmndArgs To Be Processed. Each As Any."
-            )
-
-        return cmndArgsSpecDict
-
-
-####+BEGIN: bx:icm:python:method :methodName "cmndDocStr" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
-    """
-**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndDocStr/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
-"""
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmndDocStr(self):
-####+END:        
-        return """
-***** TODO [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Place holder for this commands doc string.
-"""
-
-    
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
-"""
-class vagrantFileUpdate(icm.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 9999,}
-
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-        interactive=False,        # Can also be called non-interactively
-        distroName=None,         # or Cmnd-Input
-        distroVersion=None,         # or Cmnd-Input
-        distroFlavor=None,         # or Cmnd-Input
-        vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
-        argsList=[],         # or Args-Input
-    ):
-        cmndOutcome = self.getOpOutcome()
-        if interactive:
-            if not self.cmndLineValidate(outcome=cmndOutcome):
-                return cmndOutcome
-            effectiveArgsList = G.icmRunArgsGet().cmndArgs
-        else:
-            effectiveArgsList = argsList
-
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
-        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
-            return cmndOutcome
-        distroName = callParamsDict['distroName']
-        distroVersion = callParamsDict['distroVersion']
-        distroFlavor = callParamsDict['distroFlavor']
-        vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
-
-        cmndArgsSpecDict = self.cmndArgsSpec()
-        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
-            return cmndOutcome
-####+END:
-
-        outcome = vagrantFileStdout().cmnd(
-            interactive=False,
-            distroName=distroName,
-            distroVersion=distroVersion,
-            distroFlavor=distroFlavor,
-            vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-        )
-        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-
-        resStr = outcome.results
-
-        outcome = generatedFileName().cmnd(
-            interactive=False,
-            distroName=distroName,
-            distroVersion=distroVersion,
-            distroFlavor=distroFlavor,
-            vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=['Vagrantfile',],
-        )
-        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
-        
-        resFilePath = outcome.results[0]
-
-        with open(resFilePath, "w") as thisFile:
-            thisFile.write(resStr + '\n')
-
-        if interactive:
-            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
-        
-        return cmndOutcome.set(
-            opError=icm.OpError.Success,
-            opResults=resFilePath,
-        )
-
-
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileTemplate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
-"""
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileTemplate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileTemplate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
 class vagrantFileTemplate(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -831,21 +676,21 @@ class vagrantFileTemplate(icm.Cmnd):
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
         vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
 
 ####+END:
 
@@ -857,7 +702,7 @@ class vagrantFileTemplate(icm.Cmnd):
             distroVersion,
             distroFlavor,
             vmConfig,
-            genWithRepoSpec,
+            sysConfigLabels,
         )
 
         vagrantTemplateHead = os.path.join(
@@ -914,13 +759,373 @@ class vagrantFileTemplate(icm.Cmnd):
 
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "generatedFileName" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "2" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /generatedFileName/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=2 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class generatedFileName(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
+    cmndArgsLen = {'Min': 0, 'Max': 2,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+
+        argName = self.cmndArgsGet("0&1", cmndArgsSpecDict, effectiveArgsList)
+
+        if argName[0] == "all":
+            cmndArgsSpec = cmndArgsSpecDict.argPositionFind("0&1")
+            argChoices = cmndArgsSpec.argChoicesGet()
+            argChoices.pop(0)
+            argName = argChoices
+
+        generatedFilesList = list()
+            
+        for each in argName:
+            icm.ANN_here("{each}".format(each=each))
+
+            hostGenGuestBaseDir = pkgAnchor_vagrantsDir_obtain()
+
+            generatedFile = os.path.join(
+                hostGenGuestBaseDir,
+                distroName,
+                distroVersion,
+                distroFlavor,
+                vmConfig,
+                sysConfigLabels,
+                each
+            )
+            generatedFilesList.append(generatedFile)
+
+            if interactive:
+                icm.ANN_write(
+                """{generatedFile}"""
+                .format(generatedFile=generatedFile)
+                )
+
+                
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=generatedFilesList,
+        )
+
+####+BEGIN: bx:icm:python:method :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "cmndArgsSpecDict" :deco "default" :argsList ""
+    """
+**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndArgsSpec/ retType=cmndArgsSpecDict argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndArgsSpec(self):
+####+END:        
+        """
+***** Cmnd Args Specification
+"""
+        cmndArgsSpecDict = icm.CmndArgsSpecDict()
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="0&1",
+            argName="actions",
+            argDefault='all',
+            argChoices=['all', 'Vagrantfile', 'sysBootstrapFile',],
+            argDescription="Output relevant information",
+        )
+
+        return cmndArgsSpecDict
+
+    
+####+BEGIN: bx:icm:python:section :title "Guest Creation Facilities"
+"""
+*  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Guest Creation Facilities*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+"""
+####+END:
+    
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdateAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdateAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileUpdateAndRun(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+
+        outcome = vagrantFileUpdate().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            argsList=argsList,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        outcome = vagrantFileRun().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            argsList=argsList,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        return outcome
+
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileRun(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+        #
+        # cmndArgs are in the form of name=value  to become additional vagrant env vars
+        #
+
+        cmndArgs = self.cmndArgsGet("0&9999", cmndArgsSpecDict, effectiveArgsList)
+
+        outcome = generatedFileName().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            argsList=['Vagrantfile',],
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+        
+        vagrantFile = outcome.results[0]
+
+        cmnd = """\
+VAGRANT_VAGRANTFILE={vagrantFile} vagrant up\
+""".format(vagrantFile=vagrantFile)
+
+        result = shRun.bash(cmnd, hide=False, warn=True, echo=True)
+       
+        # environment variables -- VAGRANT_VAGRANTFILE        
+
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=result,
+        )
+    
+
+####+BEGIN: bx:icm:python:method :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
+    """
+**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndArgsSpec/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndArgsSpec(self):
+####+END:        
+        """
+***** Cmnd Args Specification -- Each As Any.
+"""
+        cmndArgsSpecDict = icm.CmndArgsSpecDict()
+        cmndArgsSpecDict.argsDictAdd(
+            argPosition="0&9999",
+            argName="cmndArgs",
+            argChoices=[],
+            argDescription="List Of CmndArgs To Be Processed. Each As Any."
+            )
+
+        return cmndArgsSpecDict
+
+
+####+BEGIN: bx:icm:python:method :methodName "cmndDocStr" :methodType "anyOrNone" :retType "bool" :deco "default" :argsList ""
+    """
+**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndDocStr/ retType=bool argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
+"""
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmndDocStr(self):
+####+END:        
+        return """
+***** TODO [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Place holder for this commands doc string.
+"""
+
+    
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class vagrantFileUpdate(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+
+        outcome = vagrantFileStdout().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        resStr = outcome.results
+
+        outcome = generatedFileName().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            argsList=['Vagrantfile',],
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+        
+        resFilePath = outcome.results[0]
+
+        with open(resFilePath, "w") as thisFile:
+            thisFile.write(resStr + '\n')
+
+        if interactive:
+            icm.ANN_here("vagrantFilePath={val}".format(val=resFilePath))
+        
+        return cmndOutcome.set(
+            opError=icm.OpError.Success,
+            opResults=resFilePath,
+        )
+
+
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "vagrantFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /vagrantFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
 class vagrantFileStdout(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -930,21 +1135,21 @@ class vagrantFileStdout(icm.Cmnd):
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
         vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
 
 ####+END:
 
@@ -954,7 +1159,7 @@ class vagrantFileStdout(icm.Cmnd):
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
+            sysConfigLabels=sysConfigLabels,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
@@ -993,7 +1198,7 @@ class vagrantFileStdout(icm.Cmnd):
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,            
+            sysConfigLabels=sysConfigLabels,            
             verNu=verNu,
         )
 
@@ -1010,123 +1215,22 @@ class vagrantFileStdout(icm.Cmnd):
         )
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "generatedFileName" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "2" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:section :title "System (Guest And Host) Bootstrap -- Bash Scripts To Be Run On The Guest"
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /generatedFileName/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=2 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
-"""
-class generatedFileName(icm.Cmnd):
-    cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
-    cmndArgsLen = {'Min': 0, 'Max': 2,}
-
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmnd(self,
-        interactive=False,        # Can also be called non-interactively
-        distroName=None,         # or Cmnd-Input
-        distroVersion=None,         # or Cmnd-Input
-        distroFlavor=None,         # or Cmnd-Input
-        vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
-        argsList=[],         # or Args-Input
-    ):
-        cmndOutcome = self.getOpOutcome()
-        if interactive:
-            if not self.cmndLineValidate(outcome=cmndOutcome):
-                return cmndOutcome
-            effectiveArgsList = G.icmRunArgsGet().cmndArgs
-        else:
-            effectiveArgsList = argsList
-
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
-        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
-            return cmndOutcome
-        distroName = callParamsDict['distroName']
-        distroVersion = callParamsDict['distroVersion']
-        distroFlavor = callParamsDict['distroFlavor']
-        vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
-
-        cmndArgsSpecDict = self.cmndArgsSpec()
-        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
-            return cmndOutcome
-####+END:
-
-        argName = self.cmndArgsGet("0&1", cmndArgsSpecDict, effectiveArgsList)
-
-        if argName[0] == "all":
-            cmndArgsSpec = cmndArgsSpecDict.argPositionFind("0&1")
-            argChoices = cmndArgsSpec.argChoicesGet()
-            argChoices.pop(0)
-            argName = argChoices
-
-        generatedFilesList = list()
-            
-        for each in argName:
-            icm.ANN_here("{each}".format(each=each))
-
-            hostGenGuestBaseDir = pkgAnchor_vagrantsDir_obtain()
-
-            generatedFile = os.path.join(
-                hostGenGuestBaseDir,
-                distroName,
-                distroVersion,
-                distroFlavor,
-                vmConfig,
-                genWithRepoSpec,
-                each
-            )
-            generatedFilesList.append(generatedFile)
-
-            if interactive:
-                icm.ANN_write(
-                """{generatedFile}"""
-                .format(generatedFile=generatedFile)
-                )
-
-                
-        return cmndOutcome.set(
-            opError=icm.OpError.Success,
-            opResults=generatedFilesList,
-        )
-
-####+BEGIN: bx:icm:python:method :methodName "cmndArgsSpec" :methodType "anyOrNone" :retType "cmndArgsSpecDict" :deco "default" :argsList ""
-    """
-**  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Method-anyOrNone :: /cmndArgsSpec/ retType=cmndArgsSpecDict argsList=nil deco=default  [[elisp:(org-cycle)][| ]]
-"""
-    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
-    def cmndArgsSpec(self):
-####+END:        
-        """
-***** Cmnd Args Specification
-"""
-        cmndArgsSpecDict = icm.CmndArgsSpecDict()
-        cmndArgsSpecDict.argsDictAdd(
-            argPosition="0&1",
-            argName="actions",
-            argDefault='all',
-            argChoices=['all', 'Vagrantfile', 'guestBootstrapFile',],
-            argDescription="Output relevant information",
-        )
-
-        return cmndArgsSpecDict
-    
-
-####+BEGIN: bx:icm:python:section :title "Guest Bootstrap -- Bash Scripts To Be Run On The Guest"
-"""
-*  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *Guest Bootstrap -- Bash Scripts To Be Run On The Guest*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
+*  [[elisp:(beginning-of-buffer)][Top]] ############## [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(delete-other-windows)][(1)]]    *System (Guest And Host) Bootstrap -- Bash Scripts To Be Run On The Guest*  [[elisp:(org-cycle)][| ]]  [[elisp:(org-show-subtree)][|=]] 
 """
 ####+END:
     
     
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "guestBootstrapFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "sysBootstrapFileStdout" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels sysProvisionerObtain sysProvisionerRun" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /guestBootstrapFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /sysBootstrapFileStdout/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels sysProvisionerObtain sysProvisionerRun argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class guestBootstrapFileStdout(icm.Cmnd):
+class sysBootstrapFileStdout(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', 'sysProvisionerObtain', 'sysProvisionerRun', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -1136,21 +1240,25 @@ class guestBootstrapFileStdout(icm.Cmnd):
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        sysProvisionerObtain=None,         # or Cmnd-Input
+        sysProvisionerRun=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, 'sysProvisionerObtain': sysProvisionerObtain, 'sysProvisionerRun': sysProvisionerRun, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
         vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+        sysProvisionerObtain = callParamsDict['sysProvisionerObtain']
+        sysProvisionerRun = callParamsDict['sysProvisionerRun']
 
 ####+END:
 
@@ -1160,7 +1268,7 @@ class guestBootstrapFileStdout(icm.Cmnd):
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
+            sysConfigLabels=sysConfigLabels,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
@@ -1176,8 +1284,15 @@ class guestBootstrapFileStdout(icm.Cmnd):
 
         vagrantTemplateStr = vagrantTemplateMainStr
 
+        if sysConfigLabels:
+            if sysConfigLabels == "bxContainer":
+                sysProvisionerObtain = "echo git clone based on bxContainer"
+                sysProvisionerRun = "echo ./bin/bxBootstrap -i bxContainer"
+                
         resStr = vagrantTemplateStr.format(
-            #vmName=vmName,
+            bxBootstrapBase="/var/bootstrap",
+            sysProvisionerObtain=sysProvisionerObtain,
+            sysProvisionerRun=sysProvisionerRun,
         )
 
         if interactive:
@@ -1190,13 +1305,13 @@ class guestBootstrapFileStdout(icm.Cmnd):
 
 
     
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "guestBootstrapFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "sysBootstrapFileUpdate" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "0" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /guestBootstrapFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /sysBootstrapFileUpdate/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=0 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class guestBootstrapFileUpdate(icm.Cmnd):
+class sysBootstrapFileUpdate(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
     cmndArgsLen = {'Min': 0, 'Max': 0,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -1206,31 +1321,31 @@ class guestBootstrapFileUpdate(icm.Cmnd):
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
     ):
         cmndOutcome = self.getOpOutcome()
         if interactive:
             if not self.cmndLineValidate(outcome=cmndOutcome):
                 return cmndOutcome
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
         vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
 
 ####+END:
 
-        outcome = guestBootstrapFileStdout().cmnd(
+        outcome = sysBootstrapFileStdout().cmnd(
             interactive=False,
             distroName=distroName,
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
+            sysConfigLabels=sysConfigLabels,
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
 
@@ -1242,8 +1357,8 @@ class guestBootstrapFileUpdate(icm.Cmnd):
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=['guestBootstrapFile',],
+            sysConfigLabels=sysConfigLabels,
+            argsList=['sysBootstrapFile',],
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
         
@@ -1253,7 +1368,7 @@ class guestBootstrapFileUpdate(icm.Cmnd):
             thisFile.write(resStr + '\n')
 
         if interactive:
-            icm.ANN_here("guestBootstrapFilePath={val}".format(val=resFilePath))
+            icm.ANN_here("sysBootstrapFilePath={val}".format(val=resFilePath))
         
         return cmndOutcome.set(
             opError=icm.OpError.Success,
@@ -1263,13 +1378,13 @@ class guestBootstrapFileUpdate(icm.Cmnd):
 
 
 
-####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "guestBootstrapFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig genWithRepoSpec" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "sysBootstrapFileRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /guestBootstrapFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig genWithRepoSpec argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /sysBootstrapFileRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
 """
-class guestBootstrapFileRun(icm.Cmnd):
+class sysBootstrapFileRun(icm.Cmnd):
     cmndParamsMandatory = [ ]
-    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'genWithRepoSpec', ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
     cmndArgsLen = {'Min': 0, 'Max': 9999,}
 
     @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
@@ -1279,7 +1394,7 @@ class guestBootstrapFileRun(icm.Cmnd):
         distroVersion=None,         # or Cmnd-Input
         distroFlavor=None,         # or Cmnd-Input
         vmConfig=None,         # or Cmnd-Input
-        genWithRepoSpec=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
         argsList=[],         # or Args-Input
     ):
         cmndOutcome = self.getOpOutcome()
@@ -1290,14 +1405,14 @@ class guestBootstrapFileRun(icm.Cmnd):
         else:
             effectiveArgsList = argsList
 
-        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'genWithRepoSpec': genWithRepoSpec, }
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
         if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
             return cmndOutcome
         distroName = callParamsDict['distroName']
         distroVersion = callParamsDict['distroVersion']
         distroFlavor = callParamsDict['distroFlavor']
         vmConfig = callParamsDict['vmConfig']
-        genWithRepoSpec = callParamsDict['genWithRepoSpec']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
 
         cmndArgsSpecDict = self.cmndArgsSpec()
         if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
@@ -1315,8 +1430,8 @@ class guestBootstrapFileRun(icm.Cmnd):
             distroVersion=distroVersion,
             distroFlavor=distroFlavor,
             vmConfig=vmConfig,
-            genWithRepoSpec=genWithRepoSpec,
-            argsList=['guestBootstrapFile',],
+            sysConfigLabels=sysConfigLabels,
+            argsList=['sysBootstrapFile',],
         )
         if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
         
@@ -1375,26 +1490,26 @@ bash {generatedFilePath}\
 """
 ####+END:
 
-####+BEGIN: bx:icm:python:func :funcName "vmNameObtain" :funcType "anyOrNone" :retType "bool" :deco "" :argsList "distroName distroVersion distroFlavor vmConfig genWithRepoSpec"
+####+BEGIN: bx:icm:python:func :funcName "vmNameObtain" :funcType "anyOrNone" :retType "bool" :deco "" :argsList "distroName distroVersion distroFlavor vmConfig sysConfigLabels"
 """
-*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /vmNameObtain/ retType=bool argsList=(distroName distroVersion distroFlavor vmConfig genWithRepoSpec)  [[elisp:(org-cycle)][| ]]
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  Func-anyOrNone :: /vmNameObtain/ retType=bool argsList=(distroName distroVersion distroFlavor vmConfig sysConfigLabels)  [[elisp:(org-cycle)][| ]]
 """
 def vmNameObtain(
     distroName,
     distroVersion,
     distroFlavor,
     vmConfig,
-    genWithRepoSpec,
+    sysConfigLabels,
     verNu,
 ):
 ####+END:
     
-    vmName = "{distroName}-{distroVersion}-{distroFlavor}-{vmConfig}-{genWithRepoSpec}-{verNu}".format(
+    vmName = "{distroName}-{distroVersion}-{distroFlavor}-{vmConfig}-{sysConfigLabels}-{verNu}".format(
         distroName=distroName,
         distroVersion=distroVersion,
         distroFlavor=distroFlavor,
         vmConfig=vmConfig,
-        genWithRepoSpec=genWithRepoSpec,
+        sysConfigLabels=sysConfigLabels,
         verNu=verNu,
         )
     return vmName

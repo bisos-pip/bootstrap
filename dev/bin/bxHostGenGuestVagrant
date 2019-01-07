@@ -480,8 +480,8 @@ class examples(icm.Cmnd):
             cps['distroVersion'] = "18.04"
             cps['distroFlavor'] = "desktop"
             cps['vmConfig'] = "medium-nat"
-            cps['sysProvisionerObtain'] = "git clone https:/github.com/bxBootstarp"
-            cps['sysProvisionerRun'] = "./bin/bxBootstrap -i bxContainer"                                                
+            cps['sysProvisionerObtain'] = "git clone https://github.com/bxGenesis/provisioners.git"
+            cps['sysProvisionerRun'] = "./provisioners/bin/bashIcmExample.sh -i examples"                                                
             return cps
         
 
@@ -601,6 +601,9 @@ class examples(icm.Cmnd):
 """
 ####+END:
         icm.cmndExampleMenuChapter('*Create (Update) Guest Bootstrap File -- With sysProvisioner*')
+
+        cmndName = "sysBootstrapFileUpdateAndRun" ; cmndArgs = ""
+        cps=cpsInit() ; cpsCommonParsSet_provisoner(cps) ; menuItem(verbosity='none')
 
         cmndName = "sysBootstrapFileRun" ; cmndArgs = ""
         cps=cpsInit() ; cpsCommonParsSet_provisoner(cps) ; menuItem(verbosity='none')
@@ -1168,22 +1171,22 @@ class vagrantFileStdout(icm.Cmnd):
         genReposSpecBaseDir = pkgAnchor_genReposSpecDir_obtain()
 
         vagrantTemplateHead = vagrantTemplateFilesDict['head']
-        vagrantTemplateMain = vagrantTemplateFilesDict['main']
+        #vagrantTemplateMain = vagrantTemplateFilesDict['main']
         vagrantTemplateTail = vagrantTemplateFilesDict['tail']                
         
         if not os.path.isfile(vagrantTemplateHead): return(icm.EH_badOutcome(outcome))
         with open (vagrantTemplateHead, "r") as myfile:
             vagrantTemplateHeadStr = myfile.read()
 
-        if not os.path.isfile(vagrantTemplateMain): return(icm.EH_badOutcome(outcome))            
-        with open (vagrantTemplateMain, "r") as myfile:
-            vagrantTemplateMainStr = myfile.read()
+        # if not os.path.isfile(vagrantTemplateMain): return(icm.EH_badOutcome(outcome))            
+        # with open (vagrantTemplateMain, "r") as myfile:
+        #     vagrantTemplateMainStr = myfile.read()
 
         if not os.path.isfile(vagrantTemplateTail): return(icm.EH_badOutcome(outcome))                        
         with open (vagrantTemplateTail, "r") as myfile:
             vagrantTemplateTailStr = myfile.read()
 
-        vagrantTemplateStr = vagrantTemplateHeadStr + vagrantTemplateMainStr + vagrantTemplateTailStr
+        #vagrantTemplateStr = vagrantTemplateHeadStr + vagrantTemplateMainStr + vagrantTemplateTailStr
             
             
         # icm.ANN_write(
@@ -1202,9 +1205,27 @@ class vagrantFileStdout(icm.Cmnd):
             verNu=verNu,
         )
 
-        resStr = vagrantTemplateStr.format(
+        vagrantHeadStr = vagrantTemplateHeadStr.format(
             vmName=vmName,
         )
+
+        vagrantTailStr = vagrantTemplateTailStr.format(
+            vmName=vmName,
+        )
+
+        outcome = sysBootstrapFileStdout().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        provionerStr = outcome.results
+        
+        resStr = vagrantHeadStr + provionerStr + vagrantTailStr
 
         if interactive:
             print resStr
@@ -1286,8 +1307,8 @@ class sysBootstrapFileStdout(icm.Cmnd):
 
         if sysConfigLabels:
             if sysConfigLabels == "bxContainer":
-                sysProvisionerObtain = "echo git clone based on bxContainer"
-                sysProvisionerRun = "echo ./bin/bxBootstrap -i bxContainer"
+                sysProvisionerObtain = "git clone https://github.com/bxGenesis/provisioners.git"
+                sysProvisionerRun = "./provisioners/bin/bashIcmExample.sh -i examples"                                                
                 
         resStr = vagrantTemplateStr.format(
             bxBootstrapBase="/var/bootstrap",
@@ -1481,6 +1502,72 @@ bash {generatedFilePath}\
 ***** TODO [[elisp:(org-cycle)][| *CmndDesc:* | ]]  Place holder for this commands doc string.
 """
     
+
+####+BEGIN: bx:icm:python:cmnd:classHead :cmndName "sysBootstrapFileUpdateAndRun" :comment "" :parsMand "" :parsOpt "distroName distroVersion distroFlavor vmConfig sysConfigLabels" :argsMin "0" :argsMax "9999" :asFunc "" :interactiveP ""
+"""
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]]  ICM-Cmnd       :: /sysBootstrapFileUpdateAndRun/ parsMand= parsOpt=distroName distroVersion distroFlavor vmConfig sysConfigLabels argsMin=0 argsMax=9999 asFunc= interactive=  [[elisp:(org-cycle)][| ]]
+"""
+class sysBootstrapFileUpdateAndRun(icm.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ 'distroName', 'distroVersion', 'distroFlavor', 'vmConfig', 'sysConfigLabels', ]
+    cmndArgsLen = {'Min': 0, 'Max': 9999,}
+
+    @icm.subjectToTracking(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+        interactive=False,        # Can also be called non-interactively
+        distroName=None,         # or Cmnd-Input
+        distroVersion=None,         # or Cmnd-Input
+        distroFlavor=None,         # or Cmnd-Input
+        vmConfig=None,         # or Cmnd-Input
+        sysConfigLabels=None,         # or Cmnd-Input
+        argsList=[],         # or Args-Input
+    ):
+        cmndOutcome = self.getOpOutcome()
+        if interactive:
+            if not self.cmndLineValidate(outcome=cmndOutcome):
+                return cmndOutcome
+            effectiveArgsList = G.icmRunArgsGet().cmndArgs
+        else:
+            effectiveArgsList = argsList
+
+        callParamsDict = {'distroName': distroName, 'distroVersion': distroVersion, 'distroFlavor': distroFlavor, 'vmConfig': vmConfig, 'sysConfigLabels': sysConfigLabels, }
+        if not icm.cmndCallParamsValidate(callParamsDict, interactive, outcome=cmndOutcome):
+            return cmndOutcome
+        distroName = callParamsDict['distroName']
+        distroVersion = callParamsDict['distroVersion']
+        distroFlavor = callParamsDict['distroFlavor']
+        vmConfig = callParamsDict['vmConfig']
+        sysConfigLabels = callParamsDict['sysConfigLabels']
+
+        cmndArgsSpecDict = self.cmndArgsSpec()
+        if not self.cmndArgsValidate(effectiveArgsList, cmndArgsSpecDict, outcome=cmndOutcome):
+            return cmndOutcome
+####+END:
+
+        outcome = sysBootstrapFileUpdate().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            #argsList=argsList,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        outcome = sysBootstrapFileRun().cmnd(
+            interactive=False,
+            distroName=distroName,
+            distroVersion=distroVersion,
+            distroFlavor=distroFlavor,
+            vmConfig=vmConfig,
+            sysConfigLabels=sysConfigLabels,
+            #argsList=argsList,
+        )
+        if outcome.isProblematic(): return(icm.EH_badOutcome(outcome))
+
+        return outcome
+
     
     
 

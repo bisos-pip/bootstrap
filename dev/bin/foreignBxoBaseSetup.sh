@@ -99,14 +99,14 @@ function fbxoBaseSetup {
     # We set the virtenv's params to be same as system's
     #
  
-    bx-platformInfoManage.py --bisosUserName="${bisosUserName}"  -i pkgInfoParsSet
-    bx-platformInfoManage.py --bisosGroupName="${bisosGroupName}"  -i pkgInfoParsSet     
+    sudo bx-platformInfoManage.py --bisosUserName="${bisosUserName}"  -i pkgInfoParsSet
+    sudo bx-platformInfoManage.py --bisosGroupName="${bisosGroupName}"  -i pkgInfoParsSet     
 
-    bx-platformInfoManage.py --rootDir_bisos="${rootDir_bisos}"  -i pkgInfoParsSet
-    bx-platformInfoManage.py --rootDir_bxo="${rootDir_bxo}"  -i pkgInfoParsSet
-    bx-platformInfoManage.py --rootDir_deRun="${rootDir_deRun}"  -i pkgInfoParsSet    
+    sudo bx-platformInfoManage.py --rootDir_bisos="${rootDir_bisos}"  -i pkgInfoParsSet
+    sudo bx-platformInfoManage.py --rootDir_bxo="${rootDir_bxo}"  -i pkgInfoParsSet
+    sudo bx-platformInfoManage.py --rootDir_deRun="${rootDir_deRun}"  -i pkgInfoParsSet    
 
-    bx-platformInfoManage.py --rootDir_foreignBxo="${fbxoBase}"  -i pkgInfoParsSet
+    sudo bx-platformInfoManage.py --rootDir_foreignBxo="${fbxoBase}"  -i pkgInfoParsSet
 
     echo "========= bx-platformInfoManage.py -i pkgInfoParsGet ========="
     bx-platformInfoManage.py -i pkgInfoParsGet

@@ -1,0 +1,8 @@
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: Can't parse ./bootstrap/py3/bin/bxSysGenWithGitRepo: ParseError: bad input: type=3, value='"Just A Place Holder For Now"', context=(' ', (3, 5))
+RefactoringTool: No files need to be modified.
+RefactoringTool: There was 1 error:
+RefactoringTool: Can't parse ./bootstrap/py3/bin/bxSysGenWithGitRepo: ParseError: bad input: type=3, value='"Just A Place Holder For Now"', context=(' ', (3, 5))

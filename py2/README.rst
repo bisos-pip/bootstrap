@@ -41,7 +41,7 @@ Installation
 
 ::
 
-    sudo pip install bisos.bootstrap
+   sudo pip install bisos.bootstrap
 
 Usage
 =====
@@ -60,7 +60,7 @@ On any Linux machine that has kvm in its distro, run
 /usr/local/bin/bxBootstrapGuest.sh and you will end up with a guest at
 the specified desired level (as ByStar Platforms).
 
-“./bin/bxHostGenGuestVagrant”
+"./bin/bxHostGenGuestVagrant"
 -----------------------------
 
 On any Linux Machine that has VirtualBox and Vagrant installed, run
@@ -87,7 +87,7 @@ The Steps are as follows:
 
 -  Run the post install script.
 
-“./bin/bxGenWithRepo”
+"./bin/bxGenWithRepo"
 ---------------------
 
 Does the following:
@@ -95,4 +95,4 @@ Does the following:
 -  Clone specified repo
 
 -  From within that repo executes specified entry point with params and
-   args. This typically involves creating an account
+   args.  This typically involves creating an account

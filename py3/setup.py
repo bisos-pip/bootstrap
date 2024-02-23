@@ -17,7 +17,7 @@ def longDescription():
 
 
 #__version__ = get_version('unisos/icm/__init__.py')
-__version__ = '0.26'
+__version__ = '0.27'
 
 
 requires = [
@@ -34,16 +34,11 @@ requires = [
 #print('Setting up under python version %s' % sys.version)
 #print('Requirements: %s' % ','.join(requires))
 
+#
+# Feb 2024 -- MB, I think this is fully obsolete now.
+
 scripts = [
     "./bin/bx2Genesis.sh",
-    "./bin/bisosBaseDirSetup.sh",
-    "./bin/bisosMarmeInstall.sh",
-    "./bin/bisosPkgInstall.sh",
-    "./bin/foreignBxoBaseSetup.sh",
-    "./bin/bxHostGenGuestKvm.sh",
-    "./bin/bxHostGenGuestVagrant",
-    "./bin/bxGenBxoContainer",
-    "./bin/bxGenWithRepo",    
 ]
 
 

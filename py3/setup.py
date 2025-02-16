@@ -43,7 +43,7 @@ def longDescription():
 # b:py3:pypi:setup/version Arguments  :forSys t :forPyPi t :constant "666"
 ####+BEGIN: b:py3:pypi:setup/version :comment "Auto Detected"
 
-# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.28 -- forSysVersion=0.27 -- constant=NA
+# ./pypiUploadVer DID NOT exist -- forPypiVersion=0.29 -- forLocalVersion=0.27 -- constant=NA
 def pkgVersion():
         return '0.27'
 
@@ -53,12 +53,10 @@ def pkgVersion():
 ####+BEGIN: b:py3:pypi:setup/requires :extras ()
 
 requires = [
-"blee",
-"bisos.csPlayer",
 "bisos",
+"bisos.b",
 "bisos.common",
 "bisos.csPlayer",
-"bisos.currents",
 ]
 ####+END:
 
@@ -69,8 +67,6 @@ scripts = [
 'bin/bx2Genesis.sh',
 'bin/bxHostGenGuestKvm.sh',
 'bin/bxHostGenGuestVagrant',
-'bin/bxHostGenGuestVagrant.bak',
-'bin/bxHostGenGuestVagrant.tabs',
 'bin/bxSysGenWithGitRepo',
 'bin/foreignBxoBaseSetup.sh',
 'bin/Notes.org',

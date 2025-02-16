@@ -20,7 +20,7 @@ function fbxoBaseSetup {
     #   1) initial bx-platformInfoManage.py base parameters has already been setup
     #   2) bx-bases has already been setup
     #   3) This script is being run by  --bisosUserName of bx-platformInfoManage.py
-    #   4) unisos.marme has already been installed in py2-bisos-3 and/or perhaps other venv
+    #   4) uni sos.marme has already been installed in py2-bisos-3 and/or perhaps other venv
     #
     # Actions Taken:
     #   A) Above assumptions are verified
